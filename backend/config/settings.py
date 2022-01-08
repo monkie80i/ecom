@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     #local
     'shop.apps.ShopConfig',
+    'order.apps.OrderConfig',
     #third party
     'rest_framework',
 ]
