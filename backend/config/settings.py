@@ -41,8 +41,10 @@ INSTALLED_APPS = [
     #local
     'shop.apps.ShopConfig',
     'order.apps.OrderConfig',
+    'userManager.apps.UsermanagerConfig',
     #third party
     'rest_framework',
+    'phonenumber_field',
 ]
 
 MIDDLEWARE = [

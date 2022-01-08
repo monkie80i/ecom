@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from shop.models import Product
+from userManager.models import BasicUser,Address
 
 # Create your models here.
 ORDER_STATUS_CHOICES = (
@@ -11,8 +12,8 @@ ORDER_STATUS_CHOICES = (
 )
 
 class Order(models.Model):
-	user = models.ForeignKey(User,related_name='orders',on_delete=models.DO_NOTHING,null=True,blank=True)
-	#delivery_address
+	user = models.ForeignKey(BasicUser,related_name='orders',on_delete=models.DO_NOTHING,null=True,blank=True)
+	delivery_address = models.OneToOneField(Address,on_delete=models.DO_NOTHING,null=True,blank=True)
 	is_cash_on_delivery = models.BooleanField(default=False,null=True,blank=True) 
 	is_paid = models.BooleanField(default=False,null=True,blank=True)
 	status = models.CharField(max_length=12,choices=ORDER_STATUS_CHOICES,null=True,blank=True)

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from userManager.models import BasicUser,Address
 
 # Create your models here.
 class Category(models.Model):
@@ -22,7 +23,7 @@ class Product(models.Model):
 	updated = models.DateTimeField(auto_now=True)
 
 class Wishlist(models.Model):
-	user = models.OneToOneField(User,on_delete=models.CASCADE,null=True,blank=True)
+	user = models.OneToOneField(BasicUser,on_delete=models.CASCADE,null=True,blank=True)
 	is_active = models.BooleanField(default=True)
 	is_deleted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True)
@@ -38,7 +39,7 @@ class WishListItems(models.Model):
 	updated = models.DateTimeField(auto_now=True)
 
 class Cart(models.Model):
-	user = models.OneToOneField(User,on_delete=models.CASCADE,null=True,blank=True)
+	user = models.OneToOneField(BasicUser,on_delete=models.CASCADE,null=True,blank=True)
 	is_active = models.BooleanField(default=True)
 	is_deleted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True)
@@ -54,10 +55,10 @@ class CartItems(models.Model):
 	updated = models.DateTimeField(auto_now=True)
 
 class ProductReview(models.Model):
-	user = models.ForeignKey(User,related_name='product_reviews',on_delete=models.DO_NOTHING,null=True,blank=True)
+	user = models.ForeignKey(BasicUser,related_name='product_reviews',on_delete=models.DO_NOTHING,null=True,blank=True)
 	product = models.ForeignKey(Product,related_name="reviews",on_delete=models.DO_NOTHING,null=True,blank=True)
-	ratings = models.FloatField()#set cieling value as 5
-	comment = models.TextField()
+	ratings = models.FloatField(null=True,blank=True)#set cieling value as 5
+	comment = models.TextField(null=True,blank=True)
 	#images
 	is_active = models.BooleanField(default=True)
 	is_deleted = models.BooleanField(default=False)
