@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from userManager.models import BasicUser,Address
-
+# Category,Product,Wishlist,WishListItems,Cart,CartItems,ProductReview
 # Create your models here.
 class Category(models.Model):
 	name = models.CharField(max_length=100,null=True,blank=True)

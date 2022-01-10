@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from phonenumber_field.modelfields import PhoneNumberField
-
+# BasicUser,Address
 # Create your models here.
 class BasicUser(models.Model):
 	user = models.OneToOneField(User,on_delete=models.DO_NOTHING,null=True,blank=True)

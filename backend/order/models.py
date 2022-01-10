@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from shop.models import Product
 from userManager.models import BasicUser,Address
+# Order,OrderItem
 
 # Create your models here.
 ORDER_STATUS_CHOICES = (
