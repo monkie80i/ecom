@@ -4,14 +4,20 @@ from userManager.models import BasicUser,Address
 # Category,Product,Wishlist,WishListItems,Cart,CartItems,ProductReview
 # Create your models here.
 class Category(models.Model):
-	name = models.CharField(max_length=100,null=True,blank=True)
+	name = models.CharField(max_length=100,null=True,blank=True,unique=True)
 	is_active = models.BooleanField(default=True)
 	is_deleted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
+	def __str__(self):
+		return self.name
+
+	class Meta:
+		verbose_name_plural = 'Categories'
+
 class Product(models.Model):
-	category = models.ForeignKey(Category,related_name='products',on_delete=models.CASCADE,null=True,blank=True)
+	category = models.ManyToManyField(Category,related_name='products',blank=True)
 	name = models.CharField(max_length=100,null=True,blank=True)
 	#images
 	description = models.TextField(null=True,blank=True)
@@ -22,12 +28,19 @@ class Product(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
+	def __str__(self):
+		return self.name
+
 class Wishlist(models.Model):
 	user = models.OneToOneField(BasicUser,on_delete=models.CASCADE,null=True,blank=True)
 	is_active = models.BooleanField(default=True)
 	is_deleted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
+
+	#def __str__(self):
+	#	usr =  self.user.user
+	#	return usr.first_name+" "+usr.last_name
 
 class WishListItem(models.Model):
 	wish_list = models.ForeignKey(Wishlist,related_name='items',on_delete=models.CASCADE,null=True,blank=True)
@@ -38,12 +51,18 @@ class WishListItem(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
+	#def __str__(self):
+	#	return self.
+
 class Cart(models.Model):
 	user = models.OneToOneField(BasicUser,on_delete=models.CASCADE,null=True,blank=True)
 	is_active = models.BooleanField(default=True)
 	is_deleted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
+
+	#def __str__(self):
+	#	return self.
 
 	def total_cost(self):
 		total = 0
@@ -60,6 +79,9 @@ class CartItem(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
+	#def __str__(self):
+	#	return self.
+
 	def total_cost(self):
 		return self.product.price*quantity
 
@@ -73,6 +95,9 @@ class ProductReview(models.Model):
 	is_deleted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
+
+	#def __str__(self):
+	#	return self.
 	
 
 

@@ -24,5 +24,4 @@ urlpatterns = [
     path('api/v1/',include('userManager.urls')),
     path('api/v1/',include('shop.urls')),
     path('api/v1/',include('order.urls')),
-
 ]

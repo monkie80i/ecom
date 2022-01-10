@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.contrib.admin import AdminSite
 from .models import FAQCategory,FAQSubCategory,FAQ,BlogCategory,Blog,Testimonial
 
-
 # Register your models here.
 class EcomAdminSite(AdminSite):
 	site_header = 'Ecom Admin Interface'
