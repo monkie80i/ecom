@@ -38,13 +38,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #local
-    'shop.apps.ShopConfig',
-    'order.apps.OrderConfig',
-    'userManager.apps.UsermanagerConfig',
     #third party
     'rest_framework',
     'phonenumber_field',
+    'tinymce',
+    #local
+    'adminManager.apps.AdminmanagerConfig',
+    'shop.apps.ShopConfig',
+    'order.apps.OrderConfig',
+    'userManager.apps.UsermanagerConfig',
 ]
 
 MIDDLEWARE = [
