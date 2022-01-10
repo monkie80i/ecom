@@ -28,5 +28,6 @@ class OrderSerializer(serializers.ModelSerializer):
 			'status',
 			'dispatch_date',
 			'delivered_date',
+			'total_cost',
 			'created'
 		]
