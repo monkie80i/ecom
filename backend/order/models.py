@@ -26,7 +26,10 @@ class Order(models.Model):
 	updated = models.DateTimeField(auto_now=True)
 
 	def total_cost(self):
-		pass
+		total = 0
+		for item in self.items:
+			total += item.get_cost()
+		return total
 
 class OrderItem(models.Model):
 	order = models.ForeignKey(Order,related_name='items',on_delete=models.DO_NOTHING,null=True,blank=True)
