@@ -29,7 +29,7 @@ class Wishlist(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
-class WishListItems(models.Model):
+class WishListItem(models.Model):
 	wish_list = models.ForeignKey(Wishlist,related_name='items',on_delete=models.CASCADE,null=True,blank=True)
 	product = models.OneToOneField(Product,on_delete=models.CASCADE,null=True,blank=True)
 	quantity = models.IntegerField(null=True,blank=True)
@@ -45,7 +45,7 @@ class Cart(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
-class CartItems(models.Model):
+class CartItem(models.Model):
 	cart = models.ForeignKey(Cart,related_name='items',on_delete=models.CASCADE,null=True,blank=True)
 	product = models.OneToOneField(Product,on_delete=models.CASCADE,null=True,blank=True)
 	quantity = models.IntegerField(null=True,blank=True)
