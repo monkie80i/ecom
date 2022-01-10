@@ -1,6 +1,6 @@
 from django.db import models
 from tinymce import models as tinymce_models
-
+# FAQCategory,FAQSubCategory,FAQ,BlogCategory,Blog,Testimonial
 # Create your models here.
 class FAQCategory(models.Model):
 	name = models.CharField(max_length=100,null=True,blank=True)
