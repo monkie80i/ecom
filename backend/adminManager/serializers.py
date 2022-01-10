@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import FAQCategory,FAQSubCategory,FAQ,BlogCategory,Blog,Testimonial
 
+#from adminManager.serializers import FAQCategorySerializer,FAQSubCategorySerializer,FAQSerializer,BlogCategorySerializer,BlogSerializer,TestimonialSerializer
+
 class FAQCategorySerializer(serializers.ModelSerializer):
 	class Meta:
 		model = FAQCategory
@@ -65,7 +67,7 @@ class BlogSerializer(serializers.ModelSerializer):
 			'is_display_on_home_page',
 			'created'
 		]
-		
+
 class TestimonialSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Testimonial

@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import BasicUser,Address
 
+#from userManager.serializers import BasicUserSerializer,AddressSerializer
+
 class BasicUserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = BasicUser

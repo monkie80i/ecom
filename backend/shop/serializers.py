@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import Category,Product,Wishlist,WishListItems,Cart,CartItems,ProductReview
+from .models import Category,Product,Wishlist,WishListItem,Cart,CartItem,ProductReview
+
+#from shop.serializers import CategorySerializer,ProductSerializer,WishListItemSerializer,WishListSerializer,CartItemSerializer,CartSerializer,ProductReviewSerializer
 
 # Create your serializers here.
 class CategorySerializer(serializers.ModelSerializer):
@@ -21,10 +23,10 @@ class ProductSerializer(serializers.ModelSerializer):
 			'created'
 		]
 
-class WishListItemsSerializer(serializers.ModelSerializer):
+class WishListItemSerializer(serializers.ModelSerializer):
 	product = ProductSerializer()
 	class Meta:
-		model = WishListItems
+		model = WishListItem
 		fields = [
 			'id',
 			'product',
@@ -33,7 +35,7 @@ class WishListItemsSerializer(serializers.ModelSerializer):
 		]
 
 class WishListSerializer(serializers.ModelSerializer):
-	items = WishListItemsSerializer(
+	items = WishListItemSerializer(
 		many=True
 		)
 
@@ -46,11 +48,10 @@ class WishListSerializer(serializers.ModelSerializer):
 			'created'
 		]
 
-
 class CartItemSerializer(serializers.ModelSerializer):
 	product = ProductSerializer()
 	class Meta:
-		model = WishListItems
+		model = CartItem
 		fields = [
 			'id',
 			'product',
@@ -64,7 +65,7 @@ class CartSerializer(serializers.ModelSerializer):
 		)
 
 	class Meta:
-		model = Wishlist
+		model = Cart
 		fields = [
 			'id',
 			'user',
