@@ -4,9 +4,17 @@ from .models import Category,Product,Wishlist,WishListItem,Cart,CartItem,Product
 #from shop.serializers import CategorySerializer,ProductSerializer,WishListItemSerializer,WishListSerializer,CartItemSerializer,CartSerializer,ProductReviewSerializer
 
 # Create your serializers here.
+
+class NonDetletedListSerializer(serializers.ListSerializer):
+	
+	def to_representation(self, data):
+		data = data.filter(is_deleted=False)
+		return super(FilteredListSerializer, self).to_representation(data)
+
 class CategorySerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Category
+		list_serializer_class = NonDetletedListSerializer
 		fields = ['id','name','created']
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -14,6 +22,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Product
+		list_serializer_class = NonDetletedListSerializer
 		fields = [
 			'id',
 			'category',
@@ -26,8 +35,10 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class WishListItemSerializer(serializers.ModelSerializer):
 	product = ProductSerializer()
+
 	class Meta:
 		model = WishListItem
+		list_serializer_class = NonDetletedListSerializer
 		fields = [
 			'id',
 			'product',
@@ -35,13 +46,14 @@ class WishListItemSerializer(serializers.ModelSerializer):
 			'created'
 		]
 
+
+
 class WishListSerializer(serializers.ModelSerializer):
-	items = WishListItemSerializer(
-		many=True
-		)
+	items = WishListItemSerializer(many=True)
 
 	class Meta:
 		model = Wishlist
+		list_serializer_class = NonDetletedListSerializer
 		fields = [
 			'id',
 			'user',
@@ -53,6 +65,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 	product = ProductSerializer()
 	class Meta:
 		model = CartItem
+		list_serializer_class = NonDetletedListSerializer
 		fields = [
 			'id',
 			'product',
@@ -67,6 +80,7 @@ class CartSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Cart
+		list_serializer_class = NonDetletedListSerializer
 		fields = [
 			'id',
 			'user',
@@ -77,6 +91,7 @@ class CartSerializer(serializers.ModelSerializer):
 class ProductReviewSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = ProductReview
+		list_serializer_class = NonDetletedListSerializer
 		fields = [
 			'id',
 			'user',
