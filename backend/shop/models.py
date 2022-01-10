@@ -45,6 +45,12 @@ class Cart(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
+	def total_cost(self):
+		total = 0
+		for item in self.items:
+			total = total+item.total_cost()
+		return total
+
 class CartItem(models.Model):
 	cart = models.ForeignKey(Cart,related_name='items',on_delete=models.CASCADE,null=True,blank=True)
 	product = models.OneToOneField(Product,on_delete=models.CASCADE,null=True,blank=True)
@@ -53,6 +59,9 @@ class CartItem(models.Model):
 	is_deleted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
+
+	def total_cost(self):
+		return self.product.price*quantity
 
 class ProductReview(models.Model):
 	user = models.ForeignKey(BasicUser,related_name='product_reviews',on_delete=models.DO_NOTHING,null=True,blank=True)
