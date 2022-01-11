@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import BasicUser,Address
+from shop.models import Wishlist,Cart
+from dj_rest_auth.registration.serializers import RegisterSerializer
 
 #from userManager.serializers import BasicUserSerializer,AddressSerializer
 
@@ -28,3 +30,12 @@ class AddressSerializer(serializers.ModelSerializer):
 			'pincode',
 			'created',
 		]
+
+class CustomRegisterSerializer(RegisterSerializer):
+	def custom_signup(self, request, user):
+		basic_user = BasicUser(user=user)
+		basic_user.save()
+		wish_list = Wishlist(user=basic_user)
+		wish_list.save()
+		cart = Cart(user=basic_user)
+		cart.save()

@@ -9,7 +9,7 @@ class NonDetletedListSerializer(serializers.ListSerializer):
 	
 	def to_representation(self, data):
 		data = data.filter(is_deleted=False)
-		return super(FilteredListSerializer, self).to_representation(data)
+		return super(NonDetletedListSerializer, self).to_representation(data)
 
 class CategorySerializer(serializers.ModelSerializer):
 	class Meta:

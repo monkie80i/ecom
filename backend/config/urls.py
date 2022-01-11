@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from adminManager.admin import admin_site
-from django.urls import path,include
+from django.urls import re_path,path,include
+from dj_rest_auth.registration.views import VerifyEmailView
+from allauth.account.views import confirm_email
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,4 +26,8 @@ urlpatterns = [
     path('api/v1/',include('userManager.urls')),
     path('api/v1/',include('shop.urls')),
     path('api/v1/',include('order.urls')),
+    path('api-auth/',include('rest_framework.urls')),
+    path('api/v1/dj-rest-auth/',include('dj_rest_auth.urls')),
+    path('api/v1/dj-rest-auth/registration/',include('dj_rest_auth.registration.urls')),
+    re_path(r'^account-confirm-email/(?P<key>[-:\w]+)/$',confirm_email,name='account_confirm_email'),
 ]
