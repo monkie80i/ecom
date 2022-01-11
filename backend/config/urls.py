@@ -18,6 +18,22 @@ from adminManager.admin import admin_site
 from django.urls import re_path,path,include
 from dj_rest_auth.registration.views import VerifyEmailView
 from allauth.account.views import confirm_email
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view 
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Ecom API",
+        default_version="v1",
+        description="A sample API for learning DRF",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="hello@example.com"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,5 +45,7 @@ urlpatterns = [
     path('api-auth/',include('rest_framework.urls')),
     path('api/v1/dj-rest-auth/',include('dj_rest_auth.urls')),
     path('api/v1/dj-rest-auth/registration/',include('dj_rest_auth.registration.urls')),
-    re_path(r'^account-confirm-email/(?P<key>[-:\w]+)/$',confirm_email,name='account_confirm_email'),
+    #re_path(r'^account-confirm-email/(?P<key>[-:\w]+)/$',confirm_email,name='account_confirm_email'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
