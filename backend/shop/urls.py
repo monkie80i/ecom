@@ -27,7 +27,7 @@ urlpatterns = [
 	path('wish-list/item',WishListItemViewset.as_view({
 		'post':'create'
 	})),
-	path('wish-list/item<str:pk>',WishListItemViewset.as_view({
+	path('wish-list/item/<str:pk>',WishListItemViewset.as_view({
 		'put':'partial_update',
 		'delete':'destroy'
 	})),
