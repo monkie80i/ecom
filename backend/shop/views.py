@@ -5,6 +5,7 @@ from .models import Category,Product,Wishlist,WishListItem,Cart,CartItem,Product
 from .serializers import CategorySerializer,ProductSerializer,WishListItemSerializer
 from .serializers import WishListSerializer,CartItemSerializer,CartSerializer,ProductReviewSerializer
 import json
+from django.views.decorators.csrf import csrf_exempt
 #from drf_yasg.utils import swagger_auto_schema
 
 # Create your views here.
