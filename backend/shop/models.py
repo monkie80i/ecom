@@ -15,6 +15,7 @@ class Category(models.Model):
 
 	class Meta:
 		verbose_name_plural = 'Categories'
+		ordering = "-created"
 
 class Product(models.Model):
 	category = models.ManyToManyField(Category,related_name='products',blank=True)
@@ -30,6 +31,9 @@ class Product(models.Model):
 
 	def __str__(self):
 		return self.name
+
+	class Meta:
+		ordering = "-created"
 
 class Wishlist(models.Model):
 	user = models.OneToOneField(BasicUser,on_delete=models.CASCADE,null=True,blank=True)
@@ -53,6 +57,9 @@ class WishListItem(models.Model):
 
 	#def __str__(self):
 	#	return self.
+
+	class Meta:
+		ordering = "-created"
 
 class Cart(models.Model):
 	user = models.OneToOneField(BasicUser,on_delete=models.CASCADE,null=True,blank=True)
@@ -85,6 +92,9 @@ class CartItem(models.Model):
 	def total_cost(self):
 		return self.product.price*quantity
 
+	class Meta:
+		ordering = "-created"
+
 class ProductReview(models.Model):
 	user = models.ForeignKey(BasicUser,related_name='product_reviews',on_delete=models.DO_NOTHING,null=True,blank=True)
 	product = models.ForeignKey(Product,related_name="reviews",on_delete=models.DO_NOTHING,null=True,blank=True)
@@ -98,6 +108,9 @@ class ProductReview(models.Model):
 
 	#def __str__(self):
 	#	return self.
+
+	class Meta:
+		ordering = "-created"
 	
 
 
