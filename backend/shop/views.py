@@ -1,10 +1,11 @@
 from rest_framework import status,viewsets
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from .models import Category,Product,Wishlist,WishListItem,Cart,CartItem,ProductReview
 from .serializers import CategorySerializer,ProductSerializer,WishListItemSerializer
 from .serializers import WishListSerializer,CartItemSerializer,CartSerializer,ProductReviewSerializer
 import json
+from userManager.permissions import IsOwner
 from django.views.decorators.csrf import csrf_exempt
 #from drf_yasg.utils import swagger_auto_schema
 
@@ -54,6 +55,7 @@ class CategoryViewset(viewsets.ViewSet):
 			return Response(status=status.HTTP_404_NOT_FOUND)
 		category.is_active = False
 		category.is_deleted = True
+		category.save()
 		return Response({'message':'deleted'})
 
 class ProductViewset(viewsets.ViewSet):
@@ -112,9 +114,12 @@ def list_products_of_category(request,name=None):
 	return Response(serializer.data)
 
 class WishListItemViewset(viewsets.ViewSet):
-
+	permission_classes = (IsOwner,)
 	def create(self,request):
-		serializer = WishListItemSerializer(data=request.data)
+		serializer = WishListItemSerializer(
+			data=request.data,
+			context={'wish_list':request.user.basicuser.wishlist}
+		)
 		serializer.is_valid(raise_exception=True)
 		serializer.save()
 		return Response(serializer.data,status=status.HTTP_201_CREATED)
@@ -138,19 +143,21 @@ class WishListItemViewset(viewsets.ViewSet):
 		return Response({'message':'deleted'})
 
 @api_view(['GET'])
-def wishlist_retrieve(request,pk=None):
-	wish_list = Wishlist.objects.get(pk=pk)
+@permission_classes([IsOwner])
+def wishlist_retrieve(request):
+	wish_list = request.user.basicuser.wishlist
 	if wish_list.is_deleted:
 		return Response(status=status.HTTP_404_NOT_FOUND)
 	serializer = WishListSerializer(wish_list)
 	return Response(serializer.data)
 
 @api_view(['GET'])
-def wishlist_empty(request,pk=None):
+@permission_classes([IsOwner])
+def wishlist_empty(request):
 	"""
 	Removes all items froma a wishlist
 	"""
-	wish_list = Wishlist.objects.get(pk=pk)
+	wish_list = request.user.basicuser.wishlist
 	if wish_list.is_deleted:
 		return Response(status=status.HTTP_404_NOT_FOUND)
 	items = wish_list.items.all().filter(is_deleted=False)
@@ -163,9 +170,13 @@ def wishlist_empty(request,pk=None):
 
 
 class CartItemViewset(viewsets.ViewSet):
+	permission_classes = (IsOwner,)
 
 	def create(self,request):
-		serializer = CartItemSerializer(data=request.data)
+		serializer = CartItemSerializer(
+			data=request.data,
+			context={'cart':request.user.basicuser.cart}
+		)
 		serializer.is_valid(raise_exception=True)
 		serializer.save()
 		return Response(serializer.data,status=status.HTTP_201_CREATED)
@@ -189,19 +200,21 @@ class CartItemViewset(viewsets.ViewSet):
 		return Response({'message':'deleted'})
 
 @api_view(['GET'])
-def cart_retrieve(request,pk=None):
-	cart = Cart.objects.get(pk=pk)
+@permission_classes([IsOwner])
+def cart_retrieve(request):
+	cart = request.user.basicuser.cart
 	if cart.is_deleted:
 		return Response(status=status.HTTP_404_NOT_FOUND)
 	serializer = CartSerializer(cart)
 	return Response(serializer.data)
 
 @api_view(['GET'])
-def cart_empty(request,pk=None):
+@permission_classes([IsOwner])
+def cart_empty(request):
 	"""
 	Removes all items froma a wishlist
 	"""
-	cart = Cart.objects.get(pk=pk)
+	cart = request.user.basicuser.cart
 	if cart.is_deleted:
 		return Response(status=status.HTTP_404_NOT_FOUND)
 	items = cart.items.all().filter(is_deleted=False)
@@ -213,6 +226,7 @@ def cart_empty(request,pk=None):
 	return Response(serializer.data)
 
 @api_view(['GET'])
+@permission_classes([IsOwner])
 def cart_checkout(request):
 	"""create an unconfirmed order
 		retun possible delivery addresses

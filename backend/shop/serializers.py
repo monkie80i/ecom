@@ -22,7 +22,7 @@ class ProductSerializer(serializers.ModelSerializer):
 	category_set = serializers.ListField(
 		child=serializers.IntegerField(),allow_empty=True,write_only=True
 	)
-
+	
 	class Meta:
 		model = Product
 		list_serializer_class = NonDetletedListSerializer
@@ -36,9 +36,10 @@ class ProductSerializer(serializers.ModelSerializer):
 			'category_set',
 			'created'
 		]
+		read_only_fields = ['id','created']
 
 	def create(self,validated_data):
-		print(validated_data)
+		#print(validated_data)
 		categories = validated_data.pop('category_set')
 		product = Product.objects.create(**validated_data)
 		for cat in categories:
@@ -48,9 +49,65 @@ class ProductSerializer(serializers.ModelSerializer):
 				pass
 		return product
 
-class WishListItemSerializer(serializers.ModelSerializer):
-	product = ProductSerializer()
+	def update(self, instance, validated_data):
+		category_set = validated_data.pop('category_set')
+		instance.name = validated_data.get('name',instance.name)
+		instance.description = validated_data.get('description',instance.description)
+		instance.price = validated_data.get('price',instance.price)
+		instance.stock = validated_data.get('stock',instance.stock)
+		categories = [ Category.objects.get(id=cat) for cat in category_set]
+		instance.category.set(categories)
+		instance.save()
+		return instance
 
+class ProductSerializerMinimal(serializers.ModelSerializer):
+	#category = CategorySerializer(many=True,read_only=True)
+	class Meta:
+		model = Product
+		list_serializer_class = NonDetletedListSerializer
+		fields = [
+			'id',
+			'name',
+			'price',
+		]
+
+class WishListItemSerializer(serializers.ModelSerializer):
+	product = ProductSerializer(many=False,read_only=True)
+	product_id = serializers.IntegerField(write_only=True)
+	class Meta:
+		model = WishListItem
+		list_serializer_class = NonDetletedListSerializer
+		fields = [
+			'id',
+			'product',
+			'product_id',
+			'quantity',
+			'created'
+		]
+
+	def create(self,validated_data):
+		product_id = validated_data.pop('product_id')
+		product = Product.objects.get(id=product_id)
+		wish_list = self.context.get("wish_list")
+		if wish_list:
+			if wish_list.items.all().filter(product=product).exists():
+				raise Exception("Product already in wish list")
+		wish_list_item = WishListItem.objects.create(**validated_data)
+		if wish_list:
+			wish_list_item.wish_list = wish_list
+		wish_list_item.product = product
+		wish_list_item.save()
+		return wish_list_item
+		
+
+	def update(self, instance, validated_data):
+		instance.quantity = validated_data.get('quantity',instance.quantity)
+		instance.save()
+		return instance
+
+
+class WishListItemSerializerMinimal(serializers.ModelSerializer):
+	product = ProductSerializerMinimal(many=False,read_only=True)
 	class Meta:
 		model = WishListItem
 		list_serializer_class = NonDetletedListSerializer
@@ -62,22 +119,23 @@ class WishListItemSerializer(serializers.ModelSerializer):
 		]
 
 
-
 class WishListSerializer(serializers.ModelSerializer):
-	items = WishListItemSerializer(many=True)
-
+	items = WishListItemSerializerMinimal(many=True)
 	class Meta:
 		model = Wishlist
 		list_serializer_class = NonDetletedListSerializer
 		fields = [
-			'id',
 			'user',
 			'items',
+			'length',
 			'created'
 		]
 
+
 class CartItemSerializer(serializers.ModelSerializer):
-	product = ProductSerializer()
+	product = ProductSerializer(many=False,read_only=True)
+	product_id = serializers.IntegerField(write_only=True)
+
 	class Meta:
 		model = CartItem
 		list_serializer_class = NonDetletedListSerializer
@@ -85,13 +143,47 @@ class CartItemSerializer(serializers.ModelSerializer):
 			'id',
 			'product',
 			'quantity',
+			'product_id',
+			'total_cost',
 			'created'
+		]
+		read_only_fields = ['id','created','total_cost']
+
+	def create(self,validated_data):
+		product_id = validated_data.pop('product_id')
+		product = Product.objects.get(id=product_id)
+		cart = self.context.get("cart")
+		if cart:
+			if cart.items.all().filter(product=product).exists():
+				raise Exception("Product already in cart")
+		cart_item = CartItem.objects.create(**validated_data)
+		if cart:
+			cart_item.cart = cart
+		cart_item.product = product
+		cart_item.save()
+		return cart_item
+		
+
+	def update(self, instance, validated_data):
+		instance.quantity = validated_data.get('quantity',instance.quantity)
+		instance.save()
+		return instance
+
+class CartItemSerializerMinimal(serializers.ModelSerializer):
+	product = ProductSerializerMinimal(many=False,read_only=True)
+
+	class Meta:
+		model = CartItem
+		list_serializer_class = NonDetletedListSerializer
+		fields = [
+			'id',
+			'product',
+			'quantity',
+			'total_cost'
 		]
 
 class CartSerializer(serializers.ModelSerializer):
-	items = CartItemSerializer(
-		many=True
-		)
+	items = CartItemSerializerMinimal(many=True)
 
 	class Meta:
 		model = Cart
@@ -100,8 +192,11 @@ class CartSerializer(serializers.ModelSerializer):
 			'id',
 			'user',
 			'items',
+			'length',
+			'total_cost',
 			'created'
 		]
+		read_only_fields = ['id','created','items','total_cost']
 
 class ProductReviewSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -115,3 +210,4 @@ class ProductReviewSerializer(serializers.ModelSerializer):
 			'comment',
 			'created'
 		]
+		read_only_fields = ['id','created']

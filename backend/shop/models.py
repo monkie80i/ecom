@@ -15,7 +15,7 @@ class Category(models.Model):
 
 	class Meta:
 		verbose_name_plural = 'Categories'
-		ordering = "-created"
+		ordering = ("-created",)
 
 class Product(models.Model):
 	category = models.ManyToManyField(Category,related_name='products',blank=True)
@@ -33,7 +33,7 @@ class Product(models.Model):
 		return self.name
 
 	class Meta:
-		ordering = "-created"
+		ordering = ("-created",)
 
 class Wishlist(models.Model):
 	user = models.OneToOneField(BasicUser,on_delete=models.CASCADE,null=True,blank=True)
@@ -42,13 +42,15 @@ class Wishlist(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
+	def length(self):
+		return self.items.count()
 	#def __str__(self):
 	#	usr =  self.user.user
 	#	return usr.first_name+" "+usr.last_name
 
 class WishListItem(models.Model):
 	wish_list = models.ForeignKey(Wishlist,related_name='items',on_delete=models.CASCADE,null=True,blank=True)
-	product = models.OneToOneField(Product,on_delete=models.CASCADE,null=True,blank=True)
+	product = models.ForeignKey(Product,related_name='wish_list_items',on_delete=models.CASCADE,null=True,blank=True)
 	quantity = models.IntegerField(null=True,blank=True)
 	is_active = models.BooleanField(default=True)
 	is_deleted = models.BooleanField(default=False)
@@ -59,7 +61,7 @@ class WishListItem(models.Model):
 	#	return self.
 
 	class Meta:
-		ordering = "-created"
+		ordering = ("-created",)
 
 class Cart(models.Model):
 	user = models.OneToOneField(BasicUser,on_delete=models.CASCADE,null=True,blank=True)
@@ -73,13 +75,16 @@ class Cart(models.Model):
 
 	def total_cost(self):
 		total = 0
-		for item in self.items:
+		for item in self.items.all():
 			total = total+item.total_cost()
 		return total
 
+	def length(self):
+		return self.items.count()
+
 class CartItem(models.Model):
 	cart = models.ForeignKey(Cart,related_name='items',on_delete=models.CASCADE,null=True,blank=True)
-	product = models.OneToOneField(Product,on_delete=models.CASCADE,null=True,blank=True)
+	product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='cart_items',null=True,blank=True)
 	quantity = models.IntegerField(null=True,blank=True)
 	is_active = models.BooleanField(default=True)
 	is_deleted = models.BooleanField(default=False)
@@ -90,10 +95,10 @@ class CartItem(models.Model):
 	#	return self.
 
 	def total_cost(self):
-		return self.product.price*quantity
+		return self.product.price*self.quantity
 
 	class Meta:
-		ordering = "-created"
+		ordering = ("-created",)
 
 class ProductReview(models.Model):
 	user = models.ForeignKey(BasicUser,related_name='product_reviews',on_delete=models.DO_NOTHING,null=True,blank=True)
@@ -110,7 +115,7 @@ class ProductReview(models.Model):
 	#	return self.
 
 	class Meta:
-		ordering = "-created"
+		ordering = ("-created",)
 	
 
 
