@@ -18,7 +18,10 @@ class CategorySerializer(serializers.ModelSerializer):
 		fields = ['id','name','created']
 
 class ProductSerializer(serializers.ModelSerializer):
-	category = CategorySerializer(many=True)
+	category = CategorySerializer(many=True,read_only=True)
+	category_set = serializers.ListField(
+		child=serializers.IntegerField(),allow_empty=True,write_only=True
+	)
 
 	class Meta:
 		model = Product
@@ -30,8 +33,20 @@ class ProductSerializer(serializers.ModelSerializer):
 			'description',
 			'price',
 			'stock',
+			'category_set',
 			'created'
 		]
+
+	def create(self,validated_data):
+		print(validated_data)
+		categories = validated_data.pop('category_set')
+		product = Product.objects.create(**validated_data)
+		for cat in categories:
+			try:
+				product.category.add(Category.objects.get(id=cat))
+			except:
+				pass
+		return product
 
 class WishListItemSerializer(serializers.ModelSerializer):
 	product = ProductSerializer()
