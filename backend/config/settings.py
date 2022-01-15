@@ -160,3 +160,5 @@ REST_FRAMEWORK = {
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'userManager.serializers.CustomRegisterSerializer'
 }
+
+ACCOUNT_LOGOUT_ON_GET = True

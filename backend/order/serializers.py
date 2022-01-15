@@ -17,7 +17,7 @@ class OrderItemSerilizer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
 	delivery_address = AddressSerializer()
-	items = OrderItemSerilizer(many=True)
+	items = OrderItemSerilizer(many=True,read_only=True)
 
 	class Meta:
 		model = Order
@@ -34,3 +34,4 @@ class OrderSerializer(serializers.ModelSerializer):
 			'total_cost',
 			'created'
 		]
+		read_only_fields = ['id','user','delivery_address','total_cost','created']
