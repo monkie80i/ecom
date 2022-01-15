@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Order,OrderItem
+from userManager.serializers import AddressSerializer
 
 #from order.serializers import OrderSerializer,OrderItemSerilizer
 
@@ -15,7 +16,7 @@ class OrderItemSerilizer(serializers.ModelSerializer):
 		]
 
 class OrderSerializer(serializers.ModelSerializer):
-	#delivery_address = AddressSerializer
+	delivery_address = AddressSerializer()
 	items = OrderItemSerilizer(many=True)
 
 	class Meta:
@@ -23,7 +24,7 @@ class OrderSerializer(serializers.ModelSerializer):
 		fields = [
 			'id',
 			'user',
-			'items'
+			'items',
 			'delivery_address',
 			'is_cash_on_delivery',
 			'is_paid',

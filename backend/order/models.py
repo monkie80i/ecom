@@ -20,6 +20,8 @@ class Order(models.Model):
 	status = models.CharField(max_length=12,choices=ORDER_STATUS_CHOICES,null=True,blank=True)
 	dispatch_date = models.DateTimeField(null=True,blank=True)
 	delivered_date = models.DateTimeField(null=True,blank=True)
+	otp = models.CharField(max_length=6,null=True,blank=True)
+	otp_gen_time = models.DateTimeField(null=True,blank=True)
 	is_active = models.BooleanField(default=True)
 	is_deleted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True)
@@ -27,7 +29,7 @@ class Order(models.Model):
 
 	def total_cost(self):
 		total = 0
-		for item in self.items:
+		for item in self.items.all():
 			total += item.get_cost()
 		return total
 
@@ -39,4 +41,4 @@ class OrderItem(models.Model):
 	updated = models.DateTimeField(auto_now=True)
 
 	def get_cost(self):
-		return product.price*quantity
+		return self.product.price*self.quantity

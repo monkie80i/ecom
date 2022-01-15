@@ -1,8 +1,11 @@
 from rest_framework import serializers
 from .models import Category,Product,Wishlist,WishListItem,Cart,CartItem,ProductReview
-
+from order.models import Order,OrderItem
+from order.serializers import OrderSerializer,OrderItemSerilizer
+from django.core.exceptions import ObjectDoesNotExist
 #from shop.serializers import CategorySerializer,ProductSerializer,WishListItemSerializer,WishListSerializer,CartItemSerializer,CartSerializer,ProductReviewSerializer
-
+from userManager.models import Address
+from userManager.serializers import AddressSerializer
 # Create your serializers here.
 
 class NonDetletedListSerializer(serializers.ListSerializer):
@@ -211,3 +214,45 @@ class ProductReviewSerializer(serializers.ModelSerializer):
 			'created'
 		]
 		read_only_fields = ['id','created']
+
+class ConfirmOrder:
+	
+	def __init__(self,otp,order_id,delivery_address_id,is_cash_on_delivery,order,address):
+		self.otp = otp
+		self.order_id = order_id
+		self.delivery_address_id = delivery_address_id
+		self.is_cash_on_delivery = is_cash_on_delivery
+		self.order = order
+		self.address = address
+
+	def confirm(self):
+		self.order.status = 'verified'
+		self.order.save()
+		serializer = OrderSerializer(self.order)
+		return serializer.data
+
+
+class ConfirmOrderSerializer(serializers.Serializer):
+	otp = serializers.CharField(max_length=6)
+	order_id = serializers.IntegerField()
+	delivery_address_id = serializers.IntegerField()
+	is_cash_on_delivery = serializers.BooleanField()
+
+	def create(self,validated_data):
+		return ConfirmOrder(**validated_data)
+
+	def validate(self,data):
+		"""
+		check if order and address is valid
+		"""
+		try:
+			data["order"] = Order.objects.get(id=data["order_id"])
+		except ObjectDoesNotExist:
+			raise serializers.ValidationError("Order of the provided Id doesnot exist.")
+		try:
+			data["address"] = Address.objects.get(id=data["delivery_address_id"])
+		except ObjectDoesNotExist:
+			raise serializers.ValidationError("Address of the provided Id doesnot exist.")
+		#if data["otp"] != data["order"].otp:
+		#	raise serializers.ValidationError("OTP doesnot match.")
+		return data

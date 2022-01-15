@@ -82,6 +82,19 @@ class Cart(models.Model):
 	def length(self):
 		return self.items.count()
 
+	def clear(self):
+		if self.is_deleted:
+			return False
+		items = self.items.all().filter(is_deleted=False)
+		for item in items:
+			item.is_active = False
+			item.is_deleted = True
+			item.save()
+		return True
+
+	def is_empty(self):
+		return not self.items.all().filter(is_deleted=False).exists()
+
 class CartItem(models.Model):
 	cart = models.ForeignKey(Cart,related_name='items',on_delete=models.CASCADE,null=True,blank=True)
 	product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='cart_items',null=True,blank=True)

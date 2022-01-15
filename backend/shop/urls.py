@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import CategoryViewset,ProductViewset,list_products_of_category,WishListItemViewset,wishlist_retrieve,wishlist_empty
-from .views import CartItemViewset,cart_retrieve,cart_empty,cart_checkout
+from .views import CartItemViewset,cart_retrieve,cart_empty,cart_checkout,confirm_order
 
 urlpatterns = [
 	#category endpoints
@@ -46,7 +46,7 @@ urlpatterns = [
 		'delete':'destroy'
 	})),
 	path('cart/empty',cart_empty),
-	path('cart/checkout',cart_checkout)
+	path('cart/checkout',cart_checkout),
 	#ordering endpoints
-
+	path('order/confirm',confirm_order),
 ]

@@ -1,12 +1,17 @@
-from rest_framework import status,viewsets
+from rest_framework import status,viewsets,permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
 from .models import Category,Product,Wishlist,WishListItem,Cart,CartItem,ProductReview
 from .serializers import CategorySerializer,ProductSerializer,WishListItemSerializer
 from .serializers import WishListSerializer,CartItemSerializer,CartSerializer,ProductReviewSerializer
+from .serializers import ConfirmOrderSerializer
 import json
+
 from userManager.permissions import IsOwner
+from userManager.serializers import AddressSerializer
 from django.views.decorators.csrf import csrf_exempt
+from order.models import Order,OrderItem
+from order.serializers import OrderSerializer,OrderItemSerilizer
 #from drf_yasg.utils import swagger_auto_schema
 
 # Create your views here.
@@ -114,7 +119,7 @@ def list_products_of_category(request,name=None):
 	return Response(serializer.data)
 
 class WishListItemViewset(viewsets.ViewSet):
-	permission_classes = (IsOwner,)
+	permission_classes = (IsOwner,permissions.IsAuthenticated)
 	def create(self,request):
 		serializer = WishListItemSerializer(
 			data=request.data,
@@ -143,7 +148,7 @@ class WishListItemViewset(viewsets.ViewSet):
 		return Response({'message':'deleted'})
 
 @api_view(['GET'])
-@permission_classes([IsOwner])
+@permission_classes([IsOwner,permissions.IsAuthenticated])
 def wishlist_retrieve(request):
 	wish_list = request.user.basicuser.wishlist
 	if wish_list.is_deleted:
@@ -152,7 +157,7 @@ def wishlist_retrieve(request):
 	return Response(serializer.data)
 
 @api_view(['GET'])
-@permission_classes([IsOwner])
+@permission_classes([IsOwner,permissions.IsAuthenticated])
 def wishlist_empty(request):
 	"""
 	Removes all items froma a wishlist
@@ -170,7 +175,7 @@ def wishlist_empty(request):
 
 
 class CartItemViewset(viewsets.ViewSet):
-	permission_classes = (IsOwner,)
+	permission_classes = (IsOwner,permissions.IsAuthenticated)
 
 	def create(self,request):
 		serializer = CartItemSerializer(
@@ -200,7 +205,7 @@ class CartItemViewset(viewsets.ViewSet):
 		return Response({'message':'deleted'})
 
 @api_view(['GET'])
-@permission_classes([IsOwner])
+@permission_classes([IsOwner,permissions.IsAuthenticated])
 def cart_retrieve(request):
 	cart = request.user.basicuser.cart
 	if cart.is_deleted:
@@ -209,7 +214,7 @@ def cart_retrieve(request):
 	return Response(serializer.data)
 
 @api_view(['GET'])
-@permission_classes([IsOwner])
+@permission_classes([IsOwner,permissions.IsAuthenticated])
 def cart_empty(request):
 	"""
 	Removes all items froma a wishlist
@@ -226,25 +231,50 @@ def cart_empty(request):
 	return Response(serializer.data)
 
 @api_view(['GET'])
-@permission_classes([IsOwner])
+@permission_classes([IsOwner,permissions.IsAuthenticated])
 def cart_checkout(request):
 	"""create an unconfirmed order
 		retun possible delivery addresses
+		send otp
 	"""
-	pass
+	user = request.user.basicuser
+	cart = user.cart
+	print(cart.items.all().filter(is_deleted=False))
+	if cart.is_empty():
+		message ={
+			"detail":"The cart is empty."
+		}
+		return Response(message)
+	order = Order(
+		user=user,
+		status ='unverified'
+	)
+	order.save()
+	for cart_item in cart.items.all():
+		order_item = OrderItem(
+			order = order,
+			product = cart_item.product,
+			quantity = cart_item.quantity
+		)
+		order_item.save()
+	cart.clear()	
+	#send otp
+	address = request.user.basicuser.addresses.all().filter(is_deleted=False)
+	addresses = AddressSerializer(address,many=True)
+	output = {}
+	output['addresses'] = addresses.data
+	output["order_id"] = order.id
+	return Response(output,status=status.HTTP_201_CREATED)
 
-def create_order(request):
-	"""
-	Creates and order of the user
-	with the list of products
-	if cart => empty cart
-	"""
-	pass
-
+@api_view(['POST'])
+@permission_classes([IsOwner,permissions.IsAuthenticated])
 def confirm_order(request):
 	"""
-	if payement or otp success confirm order
+	with the list of products
 	"""
-	pass
-
+	serializer = ConfirmOrderSerializer(data=request.data)
+	serializer.is_valid(raise_exception=True)
+	conf = serializer.save()
+	output = conf.confirm()
+	return Response(output)
 
