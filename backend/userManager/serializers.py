@@ -31,6 +31,13 @@ class AddressSerializer(serializers.ModelSerializer):
 			'created',
 		]
 
+	def create(self,validated_data):
+		address = Address.objects.create(**validated_data)
+		user = self.context.get('user')
+		address.user = user
+		address.save()
+		return address
+
 class CustomRegisterSerializer(RegisterSerializer):
 	def custom_signup(self, request, user):
 		basic_user = BasicUser(user=user)
