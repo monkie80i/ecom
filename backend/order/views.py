@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view,permission_classes
 import json
 from userManager.permissions import IsOwner
 from .models import Order,OrderItem
+from drf_yasg.utils import swagger_auto_schema
 from . serializers import OrderSerializer,OrderItemSerilizer
 # Create your views here.
 
@@ -17,6 +18,7 @@ class OrderViewset(viewsets.ViewSet):
 		serializer = OrderSerializer(orders,many=True)
 		return Response(serializer.data)
 
+
 	def retrieve(self,request,pk=None):
 		order = Order.objects.get(pk=pk)
 		if order.is_deleted:
@@ -24,6 +26,7 @@ class OrderViewset(viewsets.ViewSet):
 		serializer = OrderSerializer(order)
 		return Response(serializer.data)
 
+	@swagger_auto_schema(request_body=OrderSerializer)
 	def update(self,request,pk=None):
 		order = Order.objects.get(pk=pk)
 		if order.is_deleted:

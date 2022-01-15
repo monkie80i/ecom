@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from userManager.permissions import IsOwner
 from .models import BasicUser,Address
 from .serializers import AddressSerializer,BasicUserSerializer
+from drf_yasg.utils import swagger_auto_schema
 # Create your views here.
 class UserAddressViewset(viewsets.ViewSet):
 	permission_classes = (IsOwner,permissions.IsAuthenticated)
@@ -16,6 +17,7 @@ class UserAddressViewset(viewsets.ViewSet):
 		serializer = AddressSerializer(address,many=True)
 		return Response(serializer.data)
 
+	@swagger_auto_schema(request_body=AddressSerializer)
 	def create(self,request):
 		basic_user = request.user.basicuser
 		serializer = AddressSerializer(data=request.data,context={'user':basic_user})
@@ -31,6 +33,7 @@ class UserAddressViewset(viewsets.ViewSet):
 		serializer = AddressSerializer(address)
 		return Response(serializer.data)
 
+	@swagger_auto_schema(request_body=AddressSerializer)
 	def update(self,request,pk=None):
 		address = Address.objects.get(pk=pk)
 		if address.is_deleted:
@@ -40,6 +43,7 @@ class UserAddressViewset(viewsets.ViewSet):
 		serializer.save()
 		return Response(serializer.data,status=status.HTTP_202_ACCEPTED)	
 
+	@swagger_auto_schema(request_body=AddressSerializer)
 	def partial_update(self,request,pk=None):
 		address = Address.objects.get(pk=pk)
 		if address.is_deleted:
@@ -70,6 +74,7 @@ class ProfileViewset(viewsets.ViewSet):
 		serializer = BasicUserSerializer(basic_user)
 		return Response(serializer.data)
 
+	@swagger_auto_schema(request_body=BasicUserSerializer)
 	def partial_update(self,request,pk=None):
 		basic_user = request.user.basicuser
 		if basic_user.is_deleted:

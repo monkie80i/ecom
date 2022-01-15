@@ -12,16 +12,18 @@ from userManager.serializers import AddressSerializer
 from django.views.decorators.csrf import csrf_exempt
 from order.models import Order,OrderItem
 from order.serializers import OrderSerializer,OrderItemSerilizer
-#from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema
 
 # Create your views here.
 
 class CategoryViewset(viewsets.ViewSet):
+
 	def list(self,request):
 		categories = Category.objects.all().filter(is_active=True)
 		serializer = CategorySerializer(categories,many=True)
 		return Response(serializer.data)
 
+	@swagger_auto_schema(request_body=CategorySerializer)
 	def create(self,request):
 		serializer = CategorySerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
@@ -36,6 +38,7 @@ class CategoryViewset(viewsets.ViewSet):
 		serializer = CategorySerializer(category)
 		return Response(serializer.data)
 
+	@swagger_auto_schema(request_body=CategorySerializer)
 	def update(self,request,pk=None):
 		category = Category.objects.get(pk=pk)
 		if category.is_deleted:
@@ -45,6 +48,7 @@ class CategoryViewset(viewsets.ViewSet):
 		serializer.save()
 		return Response(serializer.data,status=status.HTTP_202_ACCEPTED)	
 
+	@swagger_auto_schema(request_body=CategorySerializer)
 	def partial_update(self,request,pk=None):
 		category = Category.objects.get(pk=pk)
 		if category.is_deleted:
@@ -70,6 +74,7 @@ class ProductViewset(viewsets.ViewSet):
 		serializer = ProductSerializer(products,many=True)
 		return Response(serializer.data)
 
+	@swagger_auto_schema(request_body=ProductSerializer)
 	def create(self,request):
 		serializer = ProductSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
@@ -84,6 +89,7 @@ class ProductViewset(viewsets.ViewSet):
 		serializer = ProductSerializer(product)
 		return Response(serializer.data)
 
+	@swagger_auto_schema(request_body=ProductSerializer)
 	def update(self,request,pk=None):
 		product = Product.objects.get(pk=pk)
 		if product.is_deleted:
@@ -93,6 +99,7 @@ class ProductViewset(viewsets.ViewSet):
 		serializer.save()
 		return Response(serializer.data,status=status.HTTP_202_ACCEPTED)	
 
+	@swagger_auto_schema(request_body=ProductSerializer)
 	def partial_update(self,request,pk=None):
 		product = Product.objects.get(pk=pk)
 		if product.is_deleted:
@@ -120,6 +127,8 @@ def list_products_of_category(request,name=None):
 
 class WishListItemViewset(viewsets.ViewSet):
 	permission_classes = (IsOwner,permissions.IsAuthenticated)
+
+	@swagger_auto_schema(request_body=WishListItemSerializer)
 	def create(self,request):
 		serializer = WishListItemSerializer(
 			data=request.data,
@@ -129,6 +138,7 @@ class WishListItemViewset(viewsets.ViewSet):
 		serializer.save()
 		return Response(serializer.data,status=status.HTTP_201_CREATED)
 	
+	@swagger_auto_schema(request_body=WishListItemSerializer)
 	def partial_update(self,request,pk=None):
 		item = WishListItem.objects.get(pk=pk)
 		if item.is_deleted:
@@ -177,6 +187,7 @@ def wishlist_empty(request):
 class CartItemViewset(viewsets.ViewSet):
 	permission_classes = (IsOwner,permissions.IsAuthenticated)
 
+	@swagger_auto_schema(request_body=CartItemSerializer)
 	def create(self,request):
 		serializer = CartItemSerializer(
 			data=request.data,
@@ -186,6 +197,7 @@ class CartItemViewset(viewsets.ViewSet):
 		serializer.save()
 		return Response(serializer.data,status=status.HTTP_201_CREATED)
 	
+	@swagger_auto_schema(request_body=CartItemSerializer)
 	def partial_update(self,request,pk=None):
 		item = CartItem.objects.get(pk=pk)
 		if item.is_deleted:
@@ -266,6 +278,7 @@ def cart_checkout(request):
 	output["order_id"] = order.id
 	return Response(output,status=status.HTTP_201_CREATED)
 
+@swagger_auto_schema(method='post',request_body=ConfirmOrderSerializer)
 @api_view(['POST'])
 @permission_classes([IsOwner,permissions.IsAuthenticated])
 def confirm_order(request):
