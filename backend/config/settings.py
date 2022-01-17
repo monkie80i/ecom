@@ -140,7 +140,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 SITE_ID = 1
 
 #REST
@@ -162,3 +162,14 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 }
 
 ACCOUNT_LOGOUT_ON_GET = True
+
+#SMTP 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'email-smtp.ap-south-1.amazonaws.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ['SMTP_USER_UNAME']
+EMAIL_HOST_PASSWORD = os.environ['SMPT_USER_PWD']
+DEFAULT_FROM_EMAIL = 'shahzan.sadick@gmail.com'
+
